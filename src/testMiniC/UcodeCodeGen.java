@@ -15,8 +15,5 @@ public class UcodeCodeGen {
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(new MiniCPrintListener(), tree);
 
-        PrintFlow p = new PrintFlow();
-        p.printRectangle();
-
     }
 }

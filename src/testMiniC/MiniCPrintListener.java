@@ -33,7 +33,11 @@ public class MiniCPrintListener extends MiniCBaseListener {
         decl += printSpace(11) + "end";
         newTexts.put(ctx, decl);
 
-        System.out.println(newTexts.get(ctx));
+//        System.out.println(newTexts.get(ctx));
+
+        PrintFlow p = new PrintFlow();
+        p.printRectangle();
+
     }
 
     // decl	: var_decl | fun_decl
