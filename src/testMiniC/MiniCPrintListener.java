@@ -92,8 +92,11 @@ public class MiniCPrintListener extends MiniCBaseListener {
             depth--;
 
          } else if (functionTable.get(function).size() == functionCount) {
-
-            System.out.printf("%20s" + "-", function);
+        	 
+        	if(function.equals(mainfirst))
+        		System.out.printf("main- %14s" + "-", function);
+        	else
+        		System.out.printf("%20s" + "-", function);
             
             if(function.equals(functionTable.get(function).get(0))){
                System.out.printf("%20s" , function);
