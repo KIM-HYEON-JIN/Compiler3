@@ -12,7 +12,6 @@ import java.util.HashSet;
  * Created by JongHun on 2016. 11. 4..
  */
 
-
 public class MiniCPrintListener extends MiniCBaseListener {
 
    private ParseTreeProperty<String> newTexts = new ParseTreeProperty<>();
@@ -21,11 +20,11 @@ public class MiniCPrintListener extends MiniCBaseListener {
    private int global_count = 1;
    private int var_count;
    private int jump_count;
+   private String mainfirst;
 
-   private HashMap<String, ArrayList<String>> functionTable = new HashMap<>();
+   private static HashMap<String, ArrayList<String>> functionTable = new HashMap<>();
    private ArrayList<String> functionList;
 
-   
    
    // program : decl+
    @Override
@@ -33,7 +32,7 @@ public class MiniCPrintListener extends MiniCBaseListener {
       // TODO Auto-generated method stub
       super.exitProgram(ctx);
       String decl = "";
-      if (ctx.getChildCount() > 0) // declÀÌ ÇÏ³ª ÀÌ»ó Á¸ÀçÇÒ ¶§
+      if (ctx.getChildCount() > 0) // declì´ í•˜ë‚˜ ì´ìƒ ì¡´ì¬í•  ë•Œ
          for (int i = 0; i < ctx.getChildCount(); i++)
             decl += newTexts.get(ctx.decl(i));
       decl += printSpace(11) + "bgn " + (global_count - 1) + "\n";
@@ -42,23 +41,26 @@ public class MiniCPrintListener extends MiniCBaseListener {
       decl += printSpace(11) + "end";
       newTexts.put(ctx, decl);
 
-
       int numberChildOfMain = functionTable.get("main").size();
 
       System.out.println("Start The Line");
-      
       for (int i = 0; i < numberChildOfMain; i++) {
-
+    	 if(i ==0)
+    		 mainfirst = functionTable.get("main").get(i);
          String first = functionTable.get("main").get(i);
          System.out.println();
+
          drawLine(first);
          System.out.println();
+         if(i == (numberChildOfMain/2)-1)
+             //System.out.println("main");
 
          depth = 0;
       }
+      
 
-      // PrintFlow p = new PrintFlow();
-      // p.printRectangle();
+       //PrintFlow p = new PrintFlow();
+       //p.printRectangle();
 
    }
 
@@ -68,40 +70,65 @@ public class MiniCPrintListener extends MiniCBaseListener {
    public void drawLine(String function) {
       depth++;
       
+      // ex functionì€ 3ì´ë¼ê³  í•´ë´
       
       
       if (functionTable.containsKey(function)) {
          int functionCount = functionTable.get(function).size();
+         
          if (functionTable.get(function).size() == 1) {
+            
             System.out.printf("%20s" + "-", function);
-            drawLine(functionTable.get(function).get(0));
+            if(function.equals(functionTable.get(function).get(0))){
+               System.out.printf("%20s" , function);
+               System.out.print("(ì¬ê·€)");
+            }
+            else{
+               drawLine(functionTable.get(function).get(0));
+            }
+            
             depth--;
 
-         }
-         else if (functionTable.get(function).size() == functionCount) {
+         } else if (functionTable.get(function).size() == functionCount) {
 
             System.out.printf("%20s" + "-", function);
-
-            drawLine(functionTable.get(function).get(0));
-
+            
+            if(function.equals(functionTable.get(function).get(0))){
+               System.out.printf("%20s" , function);
+               System.out.print("(ì¬ê·€)");
+            }
+            else{
+               drawLine(functionTable.get(function).get(0));
+            }
+            
             for (int number = 1; number < functionCount; number++) {
 
                System.out.println();
                for (int i = 0; i < depth; i++) {
                   System.out.printf("%21s", backSpace);
                }
-               drawLine(functionTable.get(function).get(number));
+               
+               if(function.equals(functionTable.get(function).get(number))){
+                  System.out.printf("%20s" , function);
+                  System.out.print("(ì¬ê·€)");
+               }
+               
+               else{
+                  drawLine(functionTable.get(function).get(number));
+               }
+               
             }
+            
+            depth--;
+         }
+
+      } else {
+    	 if(function.equals(mainfirst))
+    		 System.out.printf("main- %14s" + "-", function);
+    	 else
+    		 System.out.printf("%20s" + "-", function);
          depth--;
       }
-
-   }else
-
-   {
-
-      System.out.printf("%20s" + "-", function);
-      depth--;
-   }
 
    }
 
@@ -112,9 +139,9 @@ public class MiniCPrintListener extends MiniCBaseListener {
       super.exitDecl(ctx);
       String decl = "";
       if (ctx.getChildCount() == 1) {
-         if (ctx.var_decl() != null) // declÀÌ var_declÀÎ °æ¿ì
+         if (ctx.var_decl() != null) // declì´ var_declì¸ ê²½ìš°
             decl += newTexts.get(ctx.var_decl());
-         else // declÀÌ fun_declÀÎ °æ¿ì
+         else // declì´ fun_declì¸ ê²½ìš°
             decl += newTexts.get(ctx.fun_decl());
       }
       newTexts.put(ctx, decl);
@@ -141,7 +168,7 @@ public class MiniCPrintListener extends MiniCBaseListener {
 
          } else if (ctx.getChildCount() == 6) {
             int size = Integer.parseInt(ctx.getChild(3).getText());
-            decl += printSpace(11) + "sym 1 " + global_count + " " + size; // ¼ıÀÚ
+            decl += printSpace(11) + "sym 1 " + global_count + " " + size; // ìˆ«ì
             global_table.put(ctx.getChild(1).getText(), "1 " + global_count);
             global_count += size;
          }
@@ -186,9 +213,9 @@ public class MiniCPrintListener extends MiniCBaseListener {
       }
 
       HashSet hs = new HashSet();
-      hs.addAll(functionList); // ArryList¸¦ HashSet¿¡ ´ã´Â´Ù.
-      functionList.clear(); // ±âÁ¸ ArrayList¸¦ ºñ¿î´Ù.
-      functionList.addAll(hs); // HashSetÀ» ArrayList¿¡ ´Ù½Ã ´ã´Â´Ù.
+      hs.addAll(functionList); // ArryListë¥¼ HashSetì— ë‹´ëŠ”ë‹¤.
+      functionList.clear(); // ê¸°ì¡´ ArrayListë¥¼ ë¹„ìš´ë‹¤.
+      functionList.addAll(hs); // HashSetì„ ArrayListì— ë‹¤ì‹œ ë‹´ëŠ”ë‹¤.
       functionTable.put(ctx.getChild(1).getText(), functionList);
 
    }
@@ -219,15 +246,15 @@ public class MiniCPrintListener extends MiniCBaseListener {
       super.exitStmt(ctx);
       String stmt = "";
       if (ctx.getChildCount() > 0) {
-         if (ctx.expr_stmt() != null) // expr_stmtÀÏ ¶§
+         if (ctx.expr_stmt() != null) // expr_stmtì¼ ë•Œ
             stmt += newTexts.get(ctx.expr_stmt());
-         else if (ctx.compound_stmt() != null) // compound_stmtÀÏ ¶§
+         else if (ctx.compound_stmt() != null) // compound_stmtì¼ ë•Œ
             stmt += newTexts.get(ctx.compound_stmt());
-         else if (ctx.if_stmt() != null) // if_stmtÀÏ ¶§
+         else if (ctx.if_stmt() != null) // if_stmtì¼ ë•Œ
             stmt += newTexts.get(ctx.if_stmt());
-         else if (ctx.while_stmt() != null) // while_stmtÀÏ ¶§
+         else if (ctx.while_stmt() != null) // while_stmtì¼ ë•Œ
             stmt += newTexts.get(ctx.while_stmt());
-         else // return_stmtÀÏ ¶§
+         else // return_stmtì¼ ë•Œ
             stmt += newTexts.get(ctx.return_stmt());
       }
       newTexts.put(ctx, stmt);
@@ -310,7 +337,7 @@ public class MiniCPrintListener extends MiniCBaseListener {
 
          if (ctx.getChildCount() == 6) {
             int size = Integer.parseInt(ctx.getChild(3).getText());
-            decl += printSpace(11) + "sym 2 " + var_count + " " + size; // ¼ıÀÚ
+            decl += printSpace(11) + "sym 2 " + var_count + " " + size; // ìˆ«ì
             var_table.put(ctx.getChild(1).getText(), "2 " + var_count);
             var_count += size;
          }
@@ -390,7 +417,7 @@ public class MiniCPrintListener extends MiniCBaseListener {
       super.exitExpr(ctx);
       String expr = "";
       if (ctx.getChildCount() > 0) {
-         // IDENT | LITERALÀÏ °æ¿ì
+         // IDENT | LITERALì¼ ê²½ìš°
          if (ctx.getChildCount() == 1) {
             if (isLocal(ctx.getChild(0).getText()))
                expr += printSpace(11) + "lod " + var_table.get(ctx.getChild(0).getText());
@@ -400,7 +427,7 @@ public class MiniCPrintListener extends MiniCBaseListener {
                expr += printSpace(11) + "ldc " + ctx.getChild(0).getText();
             expr += "\n";
          }
-         // '!' expr | '-' expr | '+' exprÀÏ °æ¿ì
+         // '!' expr | '-' expr | '+' exprì¼ ê²½ìš°
          else if (ctx.getChildCount() == 2) {
             expr += newTexts.get(ctx.expr(0));
             String op = operation(ctx.getChild(0).getText());
@@ -452,7 +479,7 @@ public class MiniCPrintListener extends MiniCBaseListener {
             }
 
          }
-         // IDENT '(' args ')' | IDENT '[' expr ']'ÀÏ °æ¿ì
+         // IDENT '(' args ')' | IDENT '[' expr ']'ì¼ ê²½ìš°
          else if (ctx.getChildCount() == 4) {
 
             if (ctx.args() != null) // args
