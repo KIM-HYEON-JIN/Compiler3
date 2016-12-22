@@ -59,8 +59,8 @@ public class MiniCPrintListener extends MiniCBaseListener {
       }
       
 
-       //PrintFlow p = new PrintFlow();
-       //p.printRectangle();
+       PrintFlow p = new PrintFlow();
+       p.printRectangle();
 
    }
 
@@ -77,8 +77,10 @@ public class MiniCPrintListener extends MiniCBaseListener {
          int functionCount = functionTable.get(function).size();
          
          if (functionTable.get(function).size() == 1) {
-            
-            System.out.printf("%20s" + "-", function);
+        	 if(function.equals(mainfirst))
+        		 System.out.printf("main- %14s" + "-", function);
+        	 else
+        		 System.out.printf("%20s" + "-", function);
             if(function.equals(functionTable.get(function).get(0))){
                System.out.printf("%20s" , function);
                System.out.print("(재귀)");
