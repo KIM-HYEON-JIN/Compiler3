@@ -4,7 +4,9 @@ import generated.MiniCBaseListener;
 import generated.MiniCParser;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by JongHun on 2016. 11. 4..
@@ -17,6 +19,9 @@ public class MiniCPrintListener extends MiniCBaseListener {
     private int global_count = 1;
     private int var_count;
     private int jump_count;
+
+    private HashMap<String, ArrayList<String>> functionTable= new HashMap<>();
+    private ArrayList<String> functionList;
 
     // program	: decl+
     @Override
@@ -37,6 +42,7 @@ public class MiniCPrintListener extends MiniCBaseListener {
 
         PrintFlow p = new PrintFlow();
         p.printRectangle();
+
 
     }
 
@@ -105,6 +111,9 @@ public class MiniCPrintListener extends MiniCBaseListener {
         var_table = new HashMap<>();
         var_count = 1;
         jump_count = 0;
+
+        functionList = new ArrayList<>();
+//        System.out.println(ctx.getChild(1).getText());
     }
 
     @Override
@@ -120,6 +129,14 @@ public class MiniCPrintListener extends MiniCBaseListener {
             stmt += printSpace(11) + "end\n";
             newTexts.put(ctx, stmt);
         }
+
+
+        HashSet hs = new HashSet();
+        hs.addAll(functionList); // ArryList를 HashSet에 담는다.
+        functionList.clear(); // 기존 ArrayList를 비운다.
+        functionList.addAll(hs); // HashSet을 ArrayList에 다시 담는다.
+        functionTable.put(ctx.getChild(1).getText(), functionList);
+
     }
 
     // params	: param (',' param)* | VOID
@@ -308,6 +325,20 @@ public class MiniCPrintListener extends MiniCBaseListener {
             stmt += "\n";
         }
         newTexts.put(ctx, stmt);
+    }
+
+    @Override
+    public void enterExpr(MiniCParser.ExprContext ctx) {
+        super.enterExpr(ctx);
+        if(ctx.getChildCount() == 4) {
+            if (ctx.args() != null){// args
+                functionList.add(ctx.getChild(0).getText());
+
+
+
+//                System.out.println("call " + ctx.getChild(0).getText());
+            }
+        }
     }
 
     // expr

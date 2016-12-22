@@ -23,6 +23,8 @@ void main(int x, int param2[]){
         ++ i;
 
     }
+    test(1);
+
     return i + 3;
 }
 
