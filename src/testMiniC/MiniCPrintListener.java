@@ -21,7 +21,7 @@ public class MiniCPrintListener extends MiniCBaseListener {
    private int var_count;
    private int jump_count;
    private String mainfirst;
-
+   private String checkrecur;
    private static HashMap<String, ArrayList<String>> functionTable = new HashMap<>();
    private ArrayList<String> functionList;
 
@@ -86,7 +86,15 @@ public class MiniCPrintListener extends MiniCBaseListener {
                System.out.print("(재귀)");
             }
             else{
-               drawLine(functionTable.get(function).get(0));
+               if(functionTable.get(function).get(0).equals(checkrecur)){
+            	   System.out.print("("+function+"과 "+checkrecur+"의 재귀)");
+               }
+               else{
+            	   checkrecur = function;
+               	   drawLine(functionTable.get(function).get(0));
+               	   checkrecur = null;
+               }
+               
             }
             
             depth--;
@@ -103,7 +111,14 @@ public class MiniCPrintListener extends MiniCBaseListener {
                System.out.print("(재귀)");
             }
             else{
-               drawLine(functionTable.get(function).get(0));
+            	if(functionTable.get(function).get(0).equals(checkrecur)){
+             	   System.out.print("("+function+"과 "+checkrecur+"의 재귀)");
+                }
+                else{
+             	   checkrecur = function;
+                	   drawLine(functionTable.get(function).get(0));
+                	   checkrecur = null;
+                }
             }
             
             for (int number = 1; number < functionCount; number++) {
